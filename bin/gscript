@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# main gscript executable
+
+
+# project directory variables
 DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR=$(pwd)
 

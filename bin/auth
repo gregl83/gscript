@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# google oauth2 access token authorization
+
+
 # configuration
 HEADER="Content-Type: application/x-www-form-urlencoded"
 CLIENT_ID="788505229024-e4as7fcdjpdvmjb4p6ensrdr9ejl8qj4.apps.googleusercontent.com"

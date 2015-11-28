@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
-# setup project
+# setup project variables
+
 
 # import initialized project
 if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     # get file id
     FILE_ID=$(cat ${PROJECT_DIR}/.gscript | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
     SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript | grep source_directory | awk -F " " '{print $2}' | tr -d ' ')
+
+    if [ ! -s ${SOURCE_DIR} ] && [ ! -d ${SOURCE_DIR} ]; then
+        echo "ERROR: invalid source directory"
+        exit 1
+    fi
 else
     echo "ERROR: project has NOT been initialized"
+    exit 1
 fi
