@@ -3,6 +3,9 @@
 # setup project variables
 
 
+. ${DIR}/git-check
+
+
 # import initialized project
 if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     # get file id

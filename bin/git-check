@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# check git dependencies
+
+
+# project must be git repository
+if [ ! -d ${PROJECT_DIR}/.git ]; then
+    echo "ERROR: project directory must be initialized git repository"
+    exit 1
+fi
+
+
+# get git status
+GIT_DIRECTORY="$PROJECT_DIR/.git"
+GIT_STATUS=$(git --git-dir=${GIT_DIRECTORY} --work-tree=${PROJECT_DIR} status -s)
+
+# project git repository must be up-to-date
+if [ "${PROJECT_DIR}" ]; then
+    echo "ERROR: project git repository must be up-to-date (commit or update .gitignore)"
+    exit 1
+fi

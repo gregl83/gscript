@@ -3,6 +3,9 @@
 # initialize project directory
 
 
+. ${DIR}/git-check
+
+
 # check if ./.gscript/project file exists
 if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     echo "ERROR: project has already been initialized"
