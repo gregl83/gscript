@@ -1,66 +1,21 @@
 #!/usr/bin/env bash
 
-# Configuration
-HEADER="Content-Type: application/x-www-form-urlencoded"
-CLIENT_ID="788505229024-e4as7fcdjpdvmjb4p6ensrdr9ejl8qj4.apps.googleusercontent.com"
-CLIENT_SECRET="WzaELrnX7lay8Q8mZRqOxX6H"
-SCOPE="https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.scripts"
-REDIRECT_URI="urn:ietf:wg:oauth:2.0:oob"
+DIR="$(dirname "$(readlink -f "$0")")"
 
 
-# Check if ~/.gscript/auth file exists
-if [ -s ~/.gscript/auth ]
+# get gscript command
+COMMAND=$1
+COMMAND_SCRIPT=${DIR}/${COMMAND}
+
+
+# verify command has script
+if [ -e ${COMMAND_SCRIPT} ] && [ ! -d ${COMMAND_SCRIPT} ]
 then
-    # Get tokens from auth file
-    ACCESS_TOKEN=$(cat ~/.gscript/auth | grep access_token | awk -F " " '{print $2}' | tr -d ' ')
-    REFRESH_TOKEN=$(cat ~/.gscript/auth | grep refresh_token | awk -F " " '{print $2}' | tr -d ' ')
+    # run auth
+    . ${DIR}/auth
+
+    . ${COMMAND_SCRIPT}
 else
-    # Get Authorization Code
-    echo -e "\nGoogle API Authorization Code is required to run gscript\n"
-
-    read -p "Press [ENTER] to get your Authorization Code..." && echo ""
-
-    xdg-open "https://accounts.google.com/o/oauth2/auth?scope=$SCOPE&redirect_uri=$REDIRECT_URI&response_type=code&client_id=$CLIENT_ID"
-
-    sleep 1 && echo -e "\nCopy Authorization Code from your default browser."
-
-    echo -e -n  "\nPaste Authorization Code then press [ENTER]: "
-    read CODE
-
-    # Get tokens using Authorization Code
-    TOKEN_RESPONSE=$(curl -s -d "code=$CODE&redirect_uri=$REDIRECT_URI&client_id=$CLIENT_ID&scope=&client_secret=$CLIENT_SECRET&grant_type=authorization_code" https://www.googleapis.com/oauth2/v3/token)
-
-    INVALID=$(echo ${TOKEN_RESPONSE} | grep "invalid")
-
-    # Check for invalid result
-    if [ "$INVALID" ]
-    then
-        echo -e "\nERROR: failed to retrieve authorization token"
-        echo "MESSAGE:"
-        echo "$TOKEN_RESPONSE"
-        exit 1
-    fi
-
-    ACCESS_TOKEN=$(echo ${TOKEN_RESPONSE} | awk -F"," '{print $1}' | awk -F":" '{print $2}' | sed s/\"//g | tr -d ' ')
-    REFRESH_TOKEN=$(echo ${TOKEN_RESPONSE} | awk -F"," '{print $4}' | awk -F":" '{print $2}' | sed s/\"//g | sed s/}// | tr -d ' ')
-
-    # Save tokens for later use
-    mkdir -p ~/.gscript && touch ~/.gscript/auth && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
-fi
-
-
-# Check if access token is still valid
-EXPIRED=$(curl -s "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$ACCESS_TOKEN" | grep 'invalid_token')
-
-if [ "$EXPIRED" ]
-then
-    # Refresh Access Token
-    echo -e "\nAccess Token has expired. Trying to refresh token..."
-
-    REFRESH_RESPONSE=$(curl -s -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" https://www.googleapis.com/oauth2/v3/token)
-
-    ACCESS_TOKEN=$(echo ${REFRESH_RESPONSE} | awk -F"," '{print $1}' | awk -F":" '{print $2}' | sed s/\"//g | tr -d ' ')
-
-    # Save tokens for later use
-    mkdir -p ~/.gscript && touch ~/.gscript/auth && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
+    echo "ERROR: unknown command $COMMAND"
+    exit 1
 fi
