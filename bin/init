@@ -8,11 +8,16 @@ if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     echo "ERROR: project has already been initialized"
 else
     # setup project configuration
-    echo -n  "File ID (list command): "
-    read FILE_ID
+    read -p  "File ID (list command): " FILE_ID
+
+    read -e -p "Source Directory [./src]: " SOURCE_DIR
+    SOURCE_DIR=${SOURCE_DIR:-"./src"}
+
+    # make source directory is missing
+    mkdir -p ${SOURCE_DIR}
 
     # save project configuration for later use
-    touch ${PROJECT_DIR}/.gscript && echo -e "file_id $FILE_ID" > ${PROJECT_DIR}/.gscript
+    touch ${PROJECT_DIR}/.gscript && echo -e "file_id $FILE_ID\nsource_dir $SOURCE_DIR" > ${PROJECT_DIR}/.gscript
 
     echo "Project initialized"
 fi
