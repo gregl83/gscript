@@ -8,7 +8,7 @@ SCOPE="https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.scripts"
 REDIRECT_URI="urn:ietf:wg:oauth:2.0:oob"
 
 
-# Check if .gscript/auth file exists
+# Check if ~/.gscript/auth file exists
 if [ -s ~/.gscript/auth ]
 then
     # Get tokens from auth file
@@ -27,7 +27,7 @@ else
     echo -e -n  "\nPaste Authorization Code then press [ENTER]: "
     read CODE
 
-    # Get Tokens using Authorization Code
+    # Get tokens using Authorization Code
     TOKEN_RESPONSE=$(curl -s -d "code=$CODE&redirect_uri=$REDIRECT_URI&client_id=$CLIENT_ID&scope=&client_secret=$CLIENT_SECRET&grant_type=authorization_code" https://www.googleapis.com/oauth2/v3/token)
 
     INVALID=$(echo ${TOKEN_RESPONSE} | grep "invalid")
@@ -45,8 +45,22 @@ else
     REFRESH_TOKEN=$(echo ${TOKEN_RESPONSE} | awk -F"," '{print $4}' | awk -F":" '{print $2}' | sed s/\"//g | sed s/}// | tr -d ' ')
 
     # Save tokens for later use
-    mkdir -p ~/.gscript && touch ~/.gscript && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" >> ~/.gscript/auth
+    mkdir -p ~/.gscript && touch ~/.gscript/auth && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
 fi
 
-echo ${ACCESS_TOKEN}
-echo ${REFRESH_TOKEN}
+
+# Check if access token is still valid
+#EXPIRED=$(curl -s "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$ACCESS_TOKEN" | grep 'invalid_token')
+
+if [ "$EXPIRED" ]
+then
+    # Refresh Access Token
+    echo -e "\nAccess Token has expired. Trying to refresh token..."
+
+    REFRESH_RESPONSE=$(curl -s -d "client_secret=$CLIENT_SECRET&grant_type=refresh_token&refresh_token=$REFRESH_TOKEN&client_id=$CLIENT_ID" https://www.googleapis.com/oauth2/v3/token)
+
+    ACCESS_TOKEN=$(echo ${REFRESH_RESPONSE} | awk -F"," '{print $1}' | awk -F":" '{print $2}' | sed s/\"//g | tr -d ' ')
+
+    # Save tokens for later use
+    mkdir -p ~/.gscript && touch ~/.gscript/auth && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
+fi
