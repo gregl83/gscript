@@ -1,3 +1,3 @@
 # gscript
 
-Google Apps Script
+Bash Google Apps Script Client
