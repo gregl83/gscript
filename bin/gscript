@@ -6,7 +6,7 @@ PROJECT_DIR=$(pwd)
 
 # get gscript command
 COMMAND=$1
-COMMAND_SCRIPT=${DIR}/${COMMAND}
+COMMAND_SCRIPT=${DIR}/commands/${COMMAND}
 
 
 # verify command has script

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# import project files
+
+. ./../project
+
+
+# get project contents
+FILES=$(curl -s -L "https://script.google.com/feeds/download/export?id=$FILE_ID&format=json&access_token=$ACCESS_TOKEN")
+
+readarray FILE_SOURCES < <(echo ${FILES} | grep -oP "(?<=\"name\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)|(?<=\"source\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)")
+
+# todo write contents to directory
+
+echo ${FILES}
+echo -e ${FILE_SOURCES[*]}

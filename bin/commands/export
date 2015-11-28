@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# export project files
+
+. ./../project
+
+# todo export project
