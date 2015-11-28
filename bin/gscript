@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 DIR="$(dirname "$(readlink -f "$0")")"
+PROJECT_DIR=$(pwd)
 
 
 # get gscript command
@@ -9,8 +10,7 @@ COMMAND_SCRIPT=${DIR}/${COMMAND}
 
 
 # verify command has script
-if [ -e ${COMMAND_SCRIPT} ] && [ ! -d ${COMMAND_SCRIPT} ]
-then
+if [ -e ${COMMAND_SCRIPT} ] && [ ! -d ${COMMAND_SCRIPT} ]; then
     # run auth
     . ${DIR}/auth
 

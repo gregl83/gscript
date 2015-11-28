@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+
+# todo https://script.google.com/feeds/download/export?id=__&format=json
+
 while [[ $# > 1 ]]
 do
     key="$1"

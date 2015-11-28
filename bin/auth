@@ -9,8 +9,7 @@ REDIRECT_URI="urn:ietf:wg:oauth:2.0:oob"
 
 
 # check if ~/.gscript/auth file exists
-if [ -s ~/.gscript/auth ]
-then
+if [ -s ~/.gscript/auth ]; then
     # get tokens from auth file
     ACCESS_TOKEN=$(cat ~/.gscript/auth | grep access_token | awk -F " " '{print $2}' | tr -d ' ')
     REFRESH_TOKEN=$(cat ~/.gscript/auth | grep refresh_token | awk -F " " '{print $2}' | tr -d ' ')
@@ -33,8 +32,7 @@ else
     INVALID=$(echo ${TOKEN_RESPONSE} | grep "invalid")
 
     # check for invalid result
-    if [ "$INVALID" ]
-    then
+    if [ "$INVALID" ]; then
         echo -e "\nERROR: failed to retrieve authorization token"
         echo "MESSAGE:"
         echo "$TOKEN_RESPONSE"
@@ -52,8 +50,7 @@ fi
 # check if access token is still valid
 EXPIRED=$(curl -s "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$ACCESS_TOKEN" | grep 'error_description')
 
-if [ "$EXPIRED" ]
-then
+if [ "$EXPIRED" ]; then
     # refresh Access Token
     echo -e "\nAccess Token has expired. Trying to refresh token..."
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# list projects for authorized user
+# list files for authorized user
 
 LIST=$(curl -s "https://www.googleapis.com/drive/v2/files?q=mimeType%3D'application%2Fvnd.google-apps.script'+and+'me'+in+owners&access_token=$ACCESS_TOKEN")
 
