@@ -50,7 +50,7 @@ fi
 
 
 # Check if access token is still valid
-#EXPIRED=$(curl -s "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$ACCESS_TOKEN" | grep 'invalid_token')
+EXPIRED=$(curl -s "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=$ACCESS_TOKEN" | grep 'invalid_token')
 
 if [ "$EXPIRED" ]
 then
