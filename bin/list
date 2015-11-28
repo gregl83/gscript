@@ -4,4 +4,6 @@
 
 LIST=$(curl -s "https://www.googleapis.com/drive/v2/files?q=mimeType%3D'application%2Fvnd.google-apps.script'+and+'me'+in+owners&access_token=$ACCESS_TOKEN")
 
-echo ${LIST}
+FILES=$(echo ${LIST} | grep -o "\"title\": \"[a-zA-Z0-9-]*\"" | awk -F " " '{print $2}' | tr -d '"')
+
+echo ${FILES}
