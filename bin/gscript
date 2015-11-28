@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# Configuration
+HEADER="Content-Type: application/x-www-form-urlencoded"
+CLIENT_ID="788505229024-e4as7fcdjpdvmjb4p6ensrdr9ejl8qj4.apps.googleusercontent.com"
+CLIENT_SECRET="WzaELrnX7lay8Q8mZRqOxX6H"
+SCOPE="https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.scripts"
+REDIRECT_URI="urn:ietf:wg:oauth:2.0:oob"
+
+
+# Check if .gscript/auth file exists
+if [ -s ~/.gscript/auth ]
+then
+    # Get tokens from auth file
+    ACCESS_TOKEN=$(cat ~/.gscript/auth | grep access_token | awk -F " " '{print $2}' | tr -d ' ')
+    REFRESH_TOKEN=$(cat ~/.gscript/auth | grep refresh_token | awk -F " " '{print $2}' | tr -d ' ')
+else
+    # Get Authorization Code
+    echo -e "\nGoogle API Authorization Code is required to run gscript\n"
+
+    read -p "Press [ENTER] to get your Authorization Code..." && echo ""
+
+    xdg-open "https://accounts.google.com/o/oauth2/auth?scope=$SCOPE&redirect_uri=$REDIRECT_URI&response_type=code&client_id=$CLIENT_ID"
+
+    sleep 1 && echo -e "\nCopy Authorization Code from your default browser."
+
+    echo -e -n  "\nPaste Authorization Code then press [ENTER]: "
+    read CODE
+
+    # Get Tokens using Authorization Code
+    TOKEN_RESPONSE=$(curl -s -d "code=$CODE&redirect_uri=$REDIRECT_URI&client_id=$CLIENT_ID&scope=&client_secret=$CLIENT_SECRET&grant_type=authorization_code" https://www.googleapis.com/oauth2/v3/token)
+
+    INVALID=$(echo ${TOKEN_RESPONSE} | grep "invalid")
+
+    # Check for invalid result
+    if [ "$INVALID" ]
+    then
+        echo -e "\nERROR: failed to retrieve authorization token"
+        echo "MESSAGE:"
+        echo "$TOKEN_RESPONSE"
+        exit 1
+    fi
+
+    ACCESS_TOKEN=$(echo ${TOKEN_RESPONSE} | awk -F"," '{print $1}' | awk -F":" '{print $2}' | sed s/\"//g | tr -d ' ')
+    REFRESH_TOKEN=$(echo ${TOKEN_RESPONSE} | awk -F"," '{print $4}' | awk -F":" '{print $2}' | sed s/\"//g | sed s/}// | tr -d ' ')
+
+    # Save tokens for later use
+    mkdir -p ~/.gscript && touch ~/.gscript && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" >> ~/.gscript/auth
+fi
+
+echo ${ACCESS_TOKEN}
+echo ${REFRESH_TOKEN}
