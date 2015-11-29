@@ -3,8 +3,8 @@
 # initialize project directory
 
 
-# check if ./.gscript/project file exists
-if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
+# check if project has already been initialized
+if [ -d ${PROJECT_DIR}/.gscript ] && [ -s ${PROJECT_DIR}/.gscript/config ]; then
     echo "ERROR: project has already been initialized"
 else
     # setup project configuration
@@ -20,7 +20,8 @@ else
     mkdir -p ${SOURCE_DIR}
 
     # save project configuration for later use
-    touch ${PROJECT_DIR}/.gscript && echo -e "file_id $FILE_ID\nsource_dir $SOURCE_DIR" > ${PROJECT_DIR}/.gscript
+    mkdir -p ${PROJECT_DIR}/.gscript && touch ${PROJECT_DIR}/.gscript/config && echo -e "file_id $FILE_ID\nsource_dir $SOURCE_DIR" > ${PROJECT_DIR}/.gscript/config
+    mkdir -p ${PROJECT_DIR}/.gscript/files
 
     echo "Project initialized"
 fi

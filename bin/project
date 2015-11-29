@@ -4,10 +4,10 @@
 
 
 # get initialized project data
-if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
+if [ -d ${PROJECT_DIR}/.gscript ] && [ -s ${PROJECT_DIR}/.gscript/config ]; then
     # get file id
-    FILE_ID=$(cat ${PROJECT_DIR}/.gscript | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
-    SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript | grep source_dir | awk -F " " '{print $2}' | tr -d ' ')
+    FILE_ID=$(cat ${PROJECT_DIR}/.gscript/config | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
+    SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript/config | grep source_dir | awk -F " " '{print $2}' | tr -d ' ')
 
     # run git repository check
     . ${DIR}/git-check

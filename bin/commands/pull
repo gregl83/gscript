@@ -6,20 +6,34 @@
 . ${DIR}/project
 
 
+# make files tracking
+mkdir -p ${PROJECT_DIR}/.gscript/files
+
+
 # get project contents
 FILES=$(curl -s -L "https://script.google.com/feeds/download/export?id=$FILE_ID&format=json&access_token=$ACCESS_TOKEN")
 
-readarray FILE_SOURCES < <(echo ${FILES} | grep -oP "(?<=\"name\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)|(?<=\"source\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)")
+readarray FILE_OBJECTS < <(echo ${FILES} | grep -oP '(?<=\"files\":\[)(\{((\"\w+\"):(\".*?(?<!\\)\")\,?)*\})|(\{((\"\w+\"):(\".*?(?<!\\)\")\,?)*\})')
+
 
 # write all project files to source directory
-for ((i=0; i<${#FILE_SOURCES[*]}; i++)); do
+for ((i=0; i<${#FILE_OBJECTS[*]}; i++)); do
     # get file details
-    filename=$(echo ${FILE_SOURCES[i]} | tr -d " ")
-    file="$filename.gs"
+    file_object=${FILE_OBJECTS[i]}
+    file_id=$(echo ${file_object} | grep -oP "(?<=\"id\":\")(.*?(?=\"))")
+    file_name=$(echo ${file_object} | grep -oP "(?<=\"name\":\")(.*?(?=\"))")
+    file_type=$(echo ${file_object} | grep -oP "(?<=\"type\":\")(.*?(?=\"))")
+    file_source=$(echo ${file_object} | grep -oP "(?<=\"source\":\")(.*?((?<!\\\)(?=\")))")
 
-    # get file source
-    file_source=${FILE_SOURCES[++i]}
+    # determine full filename
+    case "$file_type" in
+        "server_js") file="$file_name.gs" ;;
+        "html") file="$file_name.html" ;;
+    esac
 
     # write/overwrite project file
     echo -e ${file_source} | sed 's/\\"/\"/g' > ${SOURCE_DIR}/${file}
+
+    # write/overwrite file data
+    echo -e "file_id $file_id\nfile_name $file_name\nfile_type $file_type" > ${PROJECT_DIR}/.gscript/files/${file}.gscript
 done
