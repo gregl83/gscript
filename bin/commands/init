@@ -3,9 +3,6 @@
 # initialize project directory
 
 
-. ${DIR}/git-check
-
-
 # check if ./.gscript/project file exists
 if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     echo "ERROR: project has already been initialized"
@@ -15,6 +12,9 @@ else
 
     read -e -p "Source Directory [./src]: " SOURCE_DIR
     SOURCE_DIR=${SOURCE_DIR:-"./src"}
+
+    # run git repository check
+    . ${DIR}/git-check
 
     # make source directory is missing
     mkdir -p ${SOURCE_DIR}

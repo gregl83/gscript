@@ -3,14 +3,14 @@
 # setup project variables
 
 
-. ${DIR}/git-check
-
-
 # import initialized project
 if [ -s ${PROJECT_DIR}/.gscript ] && [ ! -d ${PROJECT_DIR}/.gscript ]; then
     # get file id
     FILE_ID=$(cat ${PROJECT_DIR}/.gscript | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
-    SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript | grep source_directory | awk -F " " '{print $2}' | tr -d ' ')
+    SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript | grep source_dir | awk -F " " '{print $2}' | tr -d ' ')
+
+    # run git repository check
+    . ${DIR}/git-check
 
     if [ ! -s ${SOURCE_DIR} ] && [ ! -d ${SOURCE_DIR} ]; then
         echo "ERROR: invalid source directory"
