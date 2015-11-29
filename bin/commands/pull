@@ -10,6 +10,15 @@
 mkdir -p ${PROJECT_DIR}/.gscript/files
 
 
+# get source files
+SOURCE_FILES=()
+for file in ${SOURCE_DIR}/*; do
+    if [ -f ${file} ]; then
+        SOURCE_FILES+=${file}
+    fi
+done
+
+
 # get project contents
 FILES=$(curl -s -L "https://script.google.com/feeds/download/export?id=$FILE_ID&format=json&access_token=$ACCESS_TOKEN")
 
@@ -31,9 +40,35 @@ for ((i=0; i<${#FILE_OBJECTS[*]}; i++)); do
         "html") file="$file_name.html" ;;
     esac
 
+    file_path=${SOURCE_DIR}/${file}
+
     # write/overwrite project file
-    echo -e ${file_source} | sed 's/\\"/\"/g' > ${SOURCE_DIR}/${file}
+    echo -e ${file_source} | sed 's/\\"/\"/g' > ${file_path}
 
     # write/overwrite file data
     echo -e "file_id $file_id\nfile_name $file_name\nfile_type $file_type" > ${PROJECT_DIR}/.gscript/files/${file}.gscript
+
+    # remove file from source files list
+    if [ ! -z "$SOURCE_FILES" ]; then
+        SOURCE_FILES=("${SOURCE_FILES[@]/$file_path}")
+    fi
 done
+
+
+# remove deleted files
+if [ ! -z "$SOURCE_FILES" ]; then
+    for ((i=0; i<${#SOURCE_FILES[*]}; i++)); do
+        file=${SOURCE_FILES[i]}
+
+        if [ -f ${file} ]; then
+            # remove file
+            result=$(rm "$file")
+
+            # get filename
+            filename=$(echo ${file} | grep -oP "[\w-\.]+$")
+
+            # remove file data
+            rm ${PROJECT_DIR}/.gscript/files/${filename}.gscript
+        fi
+    done
+fi
