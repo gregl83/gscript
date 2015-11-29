@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# export project files
+# push project files to drive
 
 
 . ${DIR}/project

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# import project files
+# pull project files from drive
 
 
 . ${DIR}/project
