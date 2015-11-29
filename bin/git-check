@@ -15,7 +15,7 @@ GIT_DIRECTORY="$PROJECT_DIR/.git"
 GIT_STATUS=$(git --git-dir=${GIT_DIRECTORY} --work-tree=${PROJECT_DIR} status -s)
 
 # project git repository must be up-to-date
-if [ "${PROJECT_DIR}" ]; then
+if [ "${GIT_STATUS}" ]; then
     echo "ERROR: project git repository must be up-to-date (commit or update .gitignore)"
     exit 1
 fi
