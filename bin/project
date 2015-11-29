@@ -7,7 +7,9 @@
 if [ -d ${PROJECT_DIR}/.gscript ] && [ -s ${PROJECT_DIR}/.gscript/config ]; then
     # get file id
     FILE_ID=$(cat ${PROJECT_DIR}/.gscript/config | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
+    # get source directory
     SOURCE_DIR=$(cat ${PROJECT_DIR}/.gscript/config | grep source_dir | awk -F " " '{print $2}' | tr -d ' ')
+    SOURCE_DIR=$(readlink -f ${SOURCE_DIR})
 
     # run git repository check
     . ${DIR}/git-check
