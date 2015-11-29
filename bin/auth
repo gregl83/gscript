@@ -62,5 +62,5 @@ if [ "$EXPIRED" ]; then
     ACCESS_TOKEN=$(echo ${REFRESH_RESPONSE} | awk -F"," '{print $1}' | awk -F":" '{print $2}' | sed s/\"//g | tr -d ' ')
 
     # save tokens for later use
-    mkdir -p ~/.gscript && touch ~/.gscript/auth && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
+    mkdir -p ~/.gscript && echo -e "access_token $ACCESS_TOKEN\nrefresh_token $REFRESH_TOKEN" > ~/.gscript/auth
 fi
