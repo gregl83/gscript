@@ -6,7 +6,7 @@
 . ${DIR}/project
 
 
-# make files tracking
+# make gscript files directory
 mkdir -p ${PROJECT_DIR}/.gscript/files
 
 
@@ -14,7 +14,7 @@ mkdir -p ${PROJECT_DIR}/.gscript/files
 SOURCE_FILES=()
 for file in ${SOURCE_DIR}/*; do
     if [ -f ${file} ]; then
-        SOURCE_FILES+=${file}
+        SOURCE_FILES+=(${file})
     fi
 done
 
