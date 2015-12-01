@@ -6,20 +6,53 @@
 . ${DIR}/project
 
 
-# get project contents
-FILES=$(curl -s -L "https://script.google.com/feeds/download/export?id=$FILE_ID&format=json&access_token=$ACCESS_TOKEN")
-
-readarray FILE_SOURCES < <(echo ${FILES} | grep -oP "(?<=\"name\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)|(?<=\"source\":\")([^\"\\\]*(?:\\\.[^\"\\\]*)*)")
-
-# write all project files to source directory
-for ((i=0; i<${#FILE_SOURCES[*]}; i++)); do
-    # get file details
-    filename=$(echo ${FILE_SOURCES[i]} | tr -d " ")
-    file="$filename.gs"
-
-    # get file source
-    file_source=${FILE_SOURCES[++i]}
-
-    # write/overwrite project file
-    echo -e ${file_source} | sed 's/\\"/\"/g' > ${SOURCE_DIR}/${file}
+# get project files data
+FILES_DATA=()
+for file in ${PROJECT_DIR}/.gscript/files/*; do
+    if [ -f ${file} ]; then
+        # get file data
+        file_id=$(cat ${file} | grep file_id | awk -F " " '{print $2}' | tr -d ' ')
+        file_name=$(cat ${file} | grep file_name | awk -F " " '{print $2}' | tr -d ' ')
+        file_type=$(cat ${file} | grep file_type | awk -F " " '{print $2}' | tr -d ' ')
+        FILES_DATA+=("\"id\":\"$file_id\",\"name\":\"$file_name\",\"type\":\"$file_type\"")
+    fi
 done
+
+
+# open json data payload
+DATA="{\"files\":["
+
+# get files sources
+for file in ${SOURCE_DIR}/*; do
+    if [ -f ${file} ]; then
+        # get name of project file
+        name=$(echo ${file} | grep -oP "[\w-^\.]+$" | grep -oP "^[\w-\.]+?(?=\.gs|\.html)")
+
+        # check if source file has data file
+        for ((i=0; i<${#FILES_DATA[*]}; i++)); do
+            file_data=${FILES_DATA[i]}
+            file_name=$(echo ${file_data} | grep -oP "(?<=\"name\":)(\"$name\")")
+
+            # check for file data match
+            if [ "$file_name" ]; then
+                # get source
+                full_file=$(echo ${file} | grep -oP "[\w-^\.]+$")
+                file_path=$(echo ${SOURCE_DIR}/${full_file})
+
+                source=$(${DIR}/json-encode ${DIR} ${file_path} | cut -c 3- | rev | cut -c 3- | rev)
+
+                # add file to json payload
+                DATA+="{$file_data,\"source\":\"$source\"}"
+            fi
+        done
+
+        # todo create new file
+    fi
+done
+
+# close json data payload
+DATA+="]}"
+
+
+# put project files (save to drive)
+curl -H 'Content-Type: application/vnd.google-apps.script+json' -X PUT -d ${DATA} -s -L "https://www.googleapis.com/upload/drive/v2/files/${FILE_ID}?access_token=$ACCESS_TOKEN"
