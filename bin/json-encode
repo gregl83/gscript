@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# json encode a file
+
+
+# try perl encode
+perl=$(command -v prl)
+
+if [ "$perl" ]; then
+    source=$(perl $1/../src/source-to-json.pl $2)
+    echo ${source}
+    exit
+fi
+
+
+# try python encode
+python=$(command -v python)
+
+if [ "$python" ]; then
+    source=$(python $1/../src/source-to-json.py $2)
+    echo ${source}
+    exit
+fi
+
+
+# try php encode
+php=$(command -v php)
+
+if [ "$php" ]; then
+    source=$(php $1/../src/source-to-json.php $2)
+    echo ${source}
+    exit
+fi
