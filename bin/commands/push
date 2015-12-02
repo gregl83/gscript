@@ -23,11 +23,13 @@ done
 DATA="{\"files\":["
 
 # get files sources
+first_file=true
 for file in ${SOURCE_DIR}/*; do
     if [ -f ${file} ]; then
         # get name of project file
         name=$(echo ${file} | grep -oP "[\w-^\.]+$" | grep -oP "^[\w-\.]+?(?=\.gs|\.html)")
 
+        source=""
         # check if source file has data file
         for ((i=0; i<${#FILES_DATA[*]}; i++)); do
             file_data=${FILES_DATA[i]}
@@ -42,11 +44,43 @@ for file in ${SOURCE_DIR}/*; do
                 source=$(${DIR}/json-encode ${DIR} ${file_path} | cut -c 3- | rev | cut -c 3- | rev)
 
                 # add file to json payload
-                DATA+="{$file_data,\"source\":\"$source\"}"
+                if [ ${first_file} = true ]; then
+                    DATA+="{$file_data,\"source\":\"$source\"}"
+                    first_file=false
+                else
+                    DATA+=",{$file_data,\"source\":\"$source\"}"
+                fi
             fi
         done
 
-        # todo create new file
+        # todo cleanup file data for deleted files
+
+        # handle new files (no file data match)
+        if [ -z "$source" ]; then
+            file_name=$(echo ${file} | grep -oP "[\w-^\.]+$")
+            extension=$(echo ${file_name} | rev | grep -oP "^[\w-]+?(?=\.)" | rev)
+            name=$(echo ${file_name} | grep -oP "^[\w-]+?(?=\.$extension)")
+
+            # determine file type
+            type=""
+            case "$extension" in
+                "gs") type="server_js" ;;
+                "html") type="html" ;;
+            esac
+
+            # if type is supported add new file
+            if [ "$type"  ]; then
+                source=$(${DIR}/json-encode ${DIR} ${file} | cut -c 3- | rev | cut -c 3- | rev)
+
+                # add file to json payload
+                if [ ${first_file} = true ]; then
+                    DATA+="{\"name\":\"$name\",\"type\":\"$type\",\"source\":\"$source\"}"
+                    first_file=false
+                else
+                    DATA+=",{\"name\":\"$name\",\"type\":\"$type\",\"source\":\"$source\"}"
+                fi
+            fi
+        fi
     fi
 done
 
@@ -55,4 +89,12 @@ DATA+="]}"
 
 
 # put project files (save to drive)
-curl -H 'Content-Type: application/vnd.google-apps.script+json' -X PUT -d ${DATA} -s -L "https://www.googleapis.com/upload/drive/v2/files/${FILE_ID}?access_token=$ACCESS_TOKEN"
+RESPONSE=$(curl -H 'Content-Type: application/vnd.google-apps.script+json' -X PUT -d "${DATA}" -s -L "https://www.googleapis.com/upload/drive/v2/files/${FILE_ID}?access_token=$ACCESS_TOKEN")
+ERROR=$(echo ${RESPONSE} | grep "error")
+
+if [ "${ERROR}" ]; then
+    echo "ERROR: failed to push project files"
+    echo -e "MESSAGE:\n$ERROR"
+fi
+
+# todo create data file for new files
