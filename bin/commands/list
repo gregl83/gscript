@@ -8,3 +8,5 @@ LIST=$(curl -s "https://www.googleapis.com/drive/v2/files?q=mimeType%3D'applicat
 FILES=$(echo ${LIST} | grep -o ", \"title\": \"[a-zA-Z0-9-]*\"\|\"drive#file\", \"id\": \"[a-zA-Z0-9-]*\"" | tac | awk -F " " '{print $3}' | tr -d '"')
 
 echo ${FILES}
+
+echo "List completed"

@@ -98,3 +98,5 @@ if [ "${ERROR}" ]; then
 fi
 
 # todo create data file for new files
+
+echo "Push completed"
