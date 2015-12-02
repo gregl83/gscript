@@ -4,7 +4,7 @@
 
 
 # try perl encode
-perl=$(command -v prl)
+perl=$(command -v perl)
 
 if [ "$perl" ]; then
     source=$(perl $1/../src/source-to-json.pl $2)
