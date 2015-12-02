@@ -4,16 +4,16 @@ Bash Google Apps Script Client
 
 A very basic Google Apps Script client, written *mostly* in Bash, to aid with revision control of Script projects using Git.
 
-Google API OAuth2 authentication is used by the client to access Script projects in Google Drive.
+Google API OAuth2 authentication is used by the client to access Script projects within Google Drive.
 
-`Pull`, `Push`, `List` Google Apps Script projects!
+`Pull`, `Push`, and `List` Google Apps Script projects!
 
-This project was written to help with development of a drive add-on but is NOT very robust. If need be it can mature through several iterations.
+`gscript` was written to help with development of a drive add-on but is very much pre-alpha. If need be it *can* mature through many more iterations.
 
 ## Requirements
 
 - Bash
-- Perl, Python, or PHP (just one!)
+- Perl, Python, or PHP (only one is needed)
 - Git
 - Web Browser for granted OAuth2 permissions
 
@@ -26,29 +26,23 @@ Remember to edit the path to your cloned copy of `gscript`!!!
 
 ## Usage
 
-`gscript` should be run from within a git repository.
+`gscript` should always be executed from within a git repository root directory.
 
-First create a Script project in Google Drive and then a Git repository for the Project source.
- 
-Once that's done `gscript` can be used from the Project repository (directory).
+First create a Script project in Google Drive and then a Git repository for the project source.
 
-Get a list of your Google Drive Projects by running:
+Now get a list of your Google Drive projects by running the `list` command. Note: the first time `gscript` is executed it will need OAuth2 access to the Google Drive of the project.
 
     $ gscript list
-    
-Note: the first time this command is run `gscript` will need OAuth2 access to the Google Drive of the Project.
 
-The `list` command will display both Project name and a unique identifier for that project. Note the identifier of the Project.
+The `list` command will list names and unique identifiers for each project belonging to the authorized Google Drive account. Make note of the project identifier for later use.
 
-Run the `init` command from the Project repository.
+Next run the `init` command from the project repository.
  
     $ gscript init
     
-A prompt will provide a walk-through for initializing the Project (project/file id required here).
+A walk-through prompt for initializing the project (project identifier required) will run. The project source directory will default to `repository-name/src`. That is where the all the project files will exist.
 
-The Project source directory will default to `repository-name/src`. That is where the Project files will exist.
-
-After initialization run a `pull` of the Google Drive Apps Script Project files.
+After initialization run a `pull` of the Google Drive Apps Script project files.
 
     $ gscript pull
     
